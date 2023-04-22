@@ -11,13 +11,28 @@ namespace UI
     public class GameUI : MonoBehaviour
     {
         [SerializeField] private TMP_Text scoreText;
+        [SerializeField] private TMP_Text timerText;
         [SerializeField] private Transform scorePanel;
         [SerializeField] private Slider progressSlider;
         [SerializeField] private GameObject pausePanel;
         [SerializeField] private Button pauseButton;
         [SerializeField] private Button resumeButton;
         [SerializeField] private Button restartButton;
-
+        
+        private void OnEnable()
+        {
+            GameManager.OnScoreChanged += SetScoreText;
+            GameManager.OnProgressChanged += SetProgressSlider;
+            GameManager.OnTimerUpdate += SetTimer;
+        }
+        
+        private void OnDisable()
+        {
+            GameManager.OnScoreChanged -= SetScoreText;
+            GameManager.OnProgressChanged -= SetProgressSlider;
+            GameManager.OnTimerUpdate -= SetTimer;
+        }
+        
         private void Start()
         {
             pauseButton.onClick.AddListener(() =>
@@ -38,32 +53,31 @@ namespace UI
             });
         }
 
-        private void OnEnable()
-        {
-            GameManager.OnScoreChanged += SetScoreText;
-            GameManager.OnProgressChanged += SetProgressSlider;
-        }
-        
-        private void OnDisable()
-        {
-            GameManager.OnScoreChanged -= SetScoreText;
-            GameManager.OnProgressChanged -= SetProgressSlider;
-        }
-
         private void SetProgressSlider(float value)
         {
             progressSlider.value = value;
         }
         
+        private void SetTimer(float timeInSeconds)
+        {
+            int timeInSecondsInt = (int)timeInSeconds;
+            int minutes = (int) timeInSeconds / 60;
+            int seconds = timeInSecondsInt - (minutes * 60);  //Get seconds for display alongside minutes
+            timerText.text = minutes.ToString("D2") + ":" + seconds.ToString("D2");  //Create the string representation, where both seconds and minutes are at minimum 2 digits
+            
+            //timerText.SetText(TimeSpan.FromSeconds(timeInSeconds).ToString("mm:ss"));
+        }
+        
         private void SetScoreText(int value)
         {
-            scoreText.SetText(value.ToString());
-            float duration = .25f;
+            const float duration = .25f;
             
             scorePanel.transform.DOScale(1.2f, duration).SetEase(Ease.InOutCubic).OnComplete(() =>
             {
                 scorePanel.transform.DOScale(1f, duration).SetEase(Ease.InOutCubic);
             });
+            
+            scoreText.SetText(value.ToString());
         }
     }
 }

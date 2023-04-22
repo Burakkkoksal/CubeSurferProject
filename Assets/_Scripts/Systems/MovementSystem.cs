@@ -27,9 +27,9 @@ namespace Game.Systems
         
         private void Move()
         {
-            var swerveVector = inputSystem.MoveVector * swerveSpeed * Time.deltaTime;
+            var swerveVector = inputSystem.MoveVector * (swerveSpeed * Time.deltaTime);
 
-            var runVector = transform.forward * Time.deltaTime * moveSpeed;
+            var runVector = transform.forward * (Time.deltaTime * moveSpeed);
 
             var nextPos = swerveVector + runVector;
 

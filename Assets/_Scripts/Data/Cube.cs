@@ -1,7 +1,6 @@
 using Game.Base;
-using Game.Data;
 
-namespace Game.Units
+namespace Game.Data
 {
     public class Cube : InteractableBase<CubeStack>
     {

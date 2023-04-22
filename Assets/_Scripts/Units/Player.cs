@@ -1,3 +1,4 @@
+using System;
 using Game.Systems;
 using UnityEngine;
 
@@ -7,18 +8,17 @@ namespace Game.Units
     {
         private MovementSystem _movementSystem;
         
-        private void Start()
+        public bool CanMove
+        {
+            get => _movementSystem.CanMove;
+            set => _movementSystem.CanMove = value;
+        }
+
+        private void Awake()
         {
             _movementSystem = GetComponent<MovementSystem>();
-            _movementSystem.CanMove = true;
         }
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.gameObject.name == "FinalZone")
-            {
-                Debug.Log($"OnTriggerEnter{other.gameObject.name}");
-            }
-        }
+        public void SetPlayerPosition(Vector3 position) => transform.position = position;
     }
 }
 

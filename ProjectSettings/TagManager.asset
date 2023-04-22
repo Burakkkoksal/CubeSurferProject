@@ -9,6 +9,7 @@ TagManager:
   - obstacle
   - diamond
   - Pick
+  - FinalZone
   layers:
   - Default
   - TransparentFX

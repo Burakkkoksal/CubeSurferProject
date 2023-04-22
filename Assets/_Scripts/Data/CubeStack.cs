@@ -11,8 +11,9 @@ namespace Game.Data
         [SerializeField] private Transform stackStartingPoint;
         
         private Transform _playerVisual;
-        private float _cubeY = .045f;
-        private float _playerY = .025f;
+        
+        private const float CUBE_Y = .045f;
+        private const float PLAYER_Y = .025f;
 
         private void Awake()
         {
@@ -40,8 +41,17 @@ namespace Game.Data
             cube.transform.SetParent(transform.parent, true);
 
             ReorderCubes(Ease.OutQuad, .25f);
-
+            
             return true;
+        }
+        
+        public void Remove(int amount)
+        {
+            for (int i = 0; i < amount; i++)
+            {
+                if (Collection.Count == 0 || !Remove(Collection[Collection.Count - 1]))
+                    break;
+            }
         }
 
         private void ReorderCubes(Ease easeType, float tweenTime)
@@ -52,14 +62,14 @@ namespace Game.Data
             {
                 var cube = Collection[i];
                 cube.transform.DOLocalMove(cubePos, tweenTime).SetEase(easeType);
-                cubePos += new Vector3(0, _cubeY, 0);
+                cubePos += new Vector3(0, CUBE_Y, 0);
             }
 
             Vector3 playerVisualPos;
             if (Collection.Count > 0)
-                playerVisualPos = cubePos + new Vector3(0, _playerY - _cubeY , 0);
+                playerVisualPos = cubePos + new Vector3(0, PLAYER_Y - CUBE_Y , 0);
             else
-                playerVisualPos = stackStartingPoint.localPosition - new Vector3(0, -.025f, 0);
+                playerVisualPos = new Vector3(0, -.025f, 0);
 
             _playerVisual.DOLocalMove(playerVisualPos, tweenTime).SetEase(easeType);
         }
