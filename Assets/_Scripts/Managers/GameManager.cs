@@ -1,17 +1,18 @@
 using System;
 using System.Collections;
-using Game.Data;
 using Game.Units;
 using UnityEngine;
 
 namespace Game.Managers
 {
-    public enum GameState
+    public enum GameState : byte
     {
         None,
         Ready,
         Started,
-        Ended,
+        Win,
+        Lose,
+        End,
     }
     
     public class GameManager : MonoBehaviour
@@ -21,6 +22,7 @@ namespace Game.Managers
         public static event Action<int> OnScoreChanged;
         public static event Action<float> OnProgressChanged;
         public static event Action<float> OnTimerUpdate;
+        public static event Action<GameState, GameState> OnGameStateChanged;
         
         [SerializeField, Range(30, 144)] 
         private int targetFrameRate = 60;
@@ -28,17 +30,21 @@ namespace Game.Managers
         [SerializeField, Range(0f, 10f)] 
         private float gameStartCountdown = 3f;
         
-        [SerializeField] private Transform startPoint;
+        [SerializeField] 
+        private Transform startPoint;
         
         private Vector3 _startPos;
         private Vector3 _endPos;
         private GameState _gameState = GameState.None;
         
         private Player _player;
-        
+        private EndBonusManager _endBonusManager;
+
         private int _totalScore;
         private float _totalDistance;
         private float _gameTimer;
+        
+        public EndBonusManager EndBonusManager => _endBonusManager;
         
         private void OnEnable() => Diamond.OnScored += IncreaseScore;
         
@@ -61,22 +67,11 @@ namespace Game.Managers
         private void Start()
         {
             _player = GameObject.FindObjectOfType<Player>();
+            _endBonusManager = GameObject.FindObjectOfType<EndBonusManager>();
 
             PrepareGame();
         }
 
-        private void PrepareGame()
-        {
-            _startPos = startPoint.position;
-            _endPos = GameObject.FindGameObjectWithTag("FinalZone").transform.position;
-            _totalDistance = Mathf.Abs(_endPos.z - _startPos.z);
-            _player.SetPlayerPosition(_startPos);
-            
-            SetGameState(GameState.Ready);
-            
-            StartCoroutine(GameStartCountdown(gameStartCountdown));
-        }
-        
         private void Update()
         {
             if (_player == null || !_player.CanMove || _gameState != GameState.Started) return;
@@ -87,13 +82,27 @@ namespace Game.Managers
             var progress = distFromStart / _totalDistance;
             _gameTimer += Time.deltaTime;
             
-            OnProgressChanged?.Invoke(progress);
-            OnTimerUpdate?.Invoke(_gameTimer);
-            
             if (distFromStart >= _totalDistance)
             {
-                _player.CanMove = false;
+                SetGameState(GameState.Win);
             }
+            
+            OnProgressChanged?.Invoke(progress);
+            OnTimerUpdate?.Invoke(_gameTimer);
+        }
+        
+        private void PrepareGame()
+        {
+            _startPos = startPoint.position;
+            _endPos = GameObject.FindGameObjectWithTag("FinalZone").transform.position;
+            _totalDistance = Mathf.Abs(_endPos.z - _startPos.z);
+            _player.SetPlayerPosition(_startPos);
+            
+            _endBonusManager.CreateBonuses(_endPos);
+            
+            SetGameState(GameState.Ready);
+            
+            StartCoroutine(GameStartCountdown(gameStartCountdown));
         }
         
         private IEnumerator GameStartCountdown(float duration)
@@ -114,15 +123,34 @@ namespace Game.Managers
             SetGameState(GameState.Started);
         }
 
+        public void MultiplyScore(int value)
+        {
+            IncreaseScore(_totalScore * value);
+        }
         private void IncreaseScore(int value)
         {
             _totalScore += value;
             OnScoreChanged?.Invoke(_totalScore);
         }
 
-        private void SetGameState(GameState gameState)
+        public void SetGameState(GameState newState)
         {
-            _gameState = gameState;
+            Debug.Log(newState);
+            
+            var oldState = _gameState;
+
+            if ((oldState == GameState.Lose || oldState == GameState.Win) && newState != GameState.End)
+            {
+                SetGameState(GameState.End);
+                return;
+            }
+            
+            _gameState = newState;
+            
+            OnGameStateChanged?.Invoke(oldState, newState);
+            
+            if (newState == GameState.Lose)
+                SetGameState(GameState.End);
         }
     }
 }

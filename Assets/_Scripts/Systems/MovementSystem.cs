@@ -1,3 +1,4 @@
+using Game.Managers;
 using UnityEngine;
 
 namespace Game.Systems
@@ -19,6 +20,9 @@ namespace Game.Systems
         
         public bool CanMove { get; set; }
 
+        private void OnEnable() => GameManager.OnGameStateChanged += OnGameStateChange;
+        private void OnDisable() => GameManager.OnGameStateChanged -= OnGameStateChange;
+        
         private void Update()
         {
             if (CanMove)
@@ -40,6 +44,18 @@ namespace Game.Systems
             currPos = new Vector3(Mathf.Clamp(currPos.x, _minOffsetX, _maxOffsetX), currPos.y, currPos.z);
             
             transform.position = currPos;
+        }
+
+        private void OnGameStateChange(GameState oldState, GameState newState)
+        {
+            if (newState == GameState.Started || newState == GameState.Win)
+            {
+                CanMove = true;
+            }
+            else
+            {
+                CanMove = false;
+            }
         }
     }
 }

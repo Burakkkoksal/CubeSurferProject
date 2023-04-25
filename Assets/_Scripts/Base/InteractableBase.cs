@@ -21,7 +21,7 @@ namespace Game.Base
             Interact(t);
         }
 
-        protected virtual void Interact(T from)
+        protected virtual void Interact(T _)
         {
             _isInteracted = true;
             _collider.enabled = false;

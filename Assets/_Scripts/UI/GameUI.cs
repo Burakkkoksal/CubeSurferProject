@@ -12,18 +12,22 @@ namespace UI
     {
         [SerializeField] private TMP_Text scoreText;
         [SerializeField] private TMP_Text timerText;
+        [SerializeField] private TMP_Text endText;
+        [SerializeField] private Transform endPanel;
         [SerializeField] private Transform scorePanel;
         [SerializeField] private Slider progressSlider;
         [SerializeField] private GameObject pausePanel;
         [SerializeField] private Button pauseButton;
         [SerializeField] private Button resumeButton;
-        [SerializeField] private Button restartButton;
-        
+        [SerializeField] private Button exitButton;
+        [SerializeField] private Button[] restartButtons;
+
         private void OnEnable()
         {
             GameManager.OnScoreChanged += SetScoreText;
             GameManager.OnProgressChanged += SetProgressSlider;
             GameManager.OnTimerUpdate += SetTimer;
+            GameManager.OnGameStateChanged += SetEndPanel;
         }
         
         private void OnDisable()
@@ -31,6 +35,7 @@ namespace UI
             GameManager.OnScoreChanged -= SetScoreText;
             GameManager.OnProgressChanged -= SetProgressSlider;
             GameManager.OnTimerUpdate -= SetTimer;
+            GameManager.OnGameStateChanged -= SetEndPanel;
         }
         
         private void Start()
@@ -47,10 +52,23 @@ namespace UI
                 pausePanel.gameObject.SetActive(false);
             });
             
-            restartButton.onClick.AddListener(() =>
+            exitButton.onClick.AddListener(() =>
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+#if UNITY_EDITOR
+                UnityEditor.EditorApplication.isPlaying = false;
+#else
+                Application.Quit();
+#endif
             });
+
+            foreach (var restartButton in restartButtons)
+            {
+                restartButton.onClick.AddListener(() =>
+                {
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                });
+            }
+            
         }
 
         private void SetProgressSlider(float value)
@@ -66,6 +84,24 @@ namespace UI
             timerText.text = minutes.ToString("D2") + ":" + seconds.ToString("D2");  //Create the string representation, where both seconds and minutes are at minimum 2 digits
             
             //timerText.SetText(TimeSpan.FromSeconds(timeInSeconds).ToString("mm:ss"));
+        }
+        
+        private void SetEndPanel(GameState oldState, GameState newState)
+        {
+            if (newState == GameState.Win)
+            {
+                endText.text = "You won!";
+                endText.color = Color.green;
+            }
+            else if (newState == GameState.Lose)
+            {
+                endText.text = "You lost!";
+                endText.color = Color.red;
+            }
+            else if (newState == GameState.End)
+            {
+                endPanel.gameObject.SetActive(true);
+            }
         }
         
         private void SetScoreText(int value)

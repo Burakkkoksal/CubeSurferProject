@@ -8,6 +8,7 @@ namespace Game.Base
         private readonly List<T> _collection = new List<T>();
 
         public IList<T> Collection => _collection;
+        public int Count => _collection.Count;
         
         public virtual bool Add(T t)
         {

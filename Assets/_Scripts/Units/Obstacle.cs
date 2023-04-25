@@ -1,5 +1,4 @@
 using Game.Base;
-using Game.Data;
 using UnityEngine;
 
 namespace Game.Units
@@ -11,10 +10,9 @@ namespace Game.Units
         protected override void Interact(Player player)
         {
             base.Interact(player);
-            if (player.TryGetComponent<CubeStack>(out var stack))
-            {
-                stack.Remove(length);
-            }
+            var stack = player.CubeStack;
+            stack.Remove(length);
         }
     }
 }
+

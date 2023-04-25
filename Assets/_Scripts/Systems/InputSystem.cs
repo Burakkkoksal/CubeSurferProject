@@ -5,11 +5,11 @@ namespace Game.Systems
     public class InputSystem : MonoBehaviour
     {
         private float _lastMousePosX = 0;
-        private Vector3 _moveVector = Vector3.zero; 
-        private float _tolerance = 3f; 
+        private Vector3 _moveVector = Vector3.zero;
+        private const float _tolerance = 3f;
 
         public Vector3 MoveVector => _moveVector;
-
+        
         private void Update()
         {
             var mousePosX = Input.mousePosition.x;
@@ -33,6 +33,7 @@ namespace Game.Systems
             {
                 _moveVector = Vector3.zero; 
             }
+            
             _lastMousePosX = mousePosX;
         }
     }

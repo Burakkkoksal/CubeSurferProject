@@ -1,7 +1,7 @@
 using DG.Tweening;
 using Game.Base;
+using Game.Managers;
 using UnityEngine;
-using Game.Units;
 
 namespace Game.Data
 {
@@ -29,7 +29,7 @@ namespace Game.Data
             cube.transform.SetParent(stackParent, true);
             
             ReorderCubes(Ease.InQuad, .15f);
-
+            
             return true;
         }
 
@@ -41,6 +41,11 @@ namespace Game.Data
             cube.transform.SetParent(transform.parent, true);
 
             ReorderCubes(Ease.OutQuad, .25f);
+
+            if (Count == 0)
+            {
+                GameManager.Instance.SetGameState(GameState.Lose);
+            }
             
             return true;
         }
