@@ -6655,6 +6655,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d69f14d9754d49f7bda5c8c0af563cd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneNames: []
   targetFrameRate: 60
   gameStartCountdown: 3
   startPoint: {fileID: 2125758377}

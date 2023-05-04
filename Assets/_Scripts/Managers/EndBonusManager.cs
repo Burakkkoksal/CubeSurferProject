@@ -12,9 +12,12 @@ namespace Game.Managers
         [SerializeField] private Material[] bonusMaterials;
 
         private const float _bonusOffsetZ = .25f;
+        
         private int _bonus = 0;
 
         private void OnEnable() => GameManager.OnGameStateChanged += OnGameStateChange;
+        
+        private void OnDisable() => GameManager.OnGameStateChanged -= OnGameStateChange;
 
         private void OnGameStateChange(GameState oldState, GameState newState)
         {
@@ -23,8 +26,6 @@ namespace Game.Managers
                 GameManager.Instance.MultiplyScore(_bonus);
             }
         }
-
-        private void OnDisable() => GameManager.OnGameStateChanged -= OnGameStateChange;
         
         public void CreateBonuses(Vector3 bonusStartPos)
         {

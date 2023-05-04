@@ -1,6 +1,8 @@
 using System;
 using DG.Tweening;
+using Game.Data;
 using Game.Managers;
+using Game.Units;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,12 +17,15 @@ namespace UI
         [SerializeField] private TMP_Text endText;
         [SerializeField] private Transform endPanel;
         [SerializeField] private Transform scorePanel;
+        [SerializeField] private Transform startPanel;
         [SerializeField] private Slider progressSlider;
         [SerializeField] private GameObject pausePanel;
         [SerializeField] private Button pauseButton;
         [SerializeField] private Button resumeButton;
+        [SerializeField] private Button startButton;
         [SerializeField] private Button exitButton;
         [SerializeField] private Button[] restartButtons;
+        [SerializeField] private Button[] colorButtons;
 
         private void OnEnable()
         {
@@ -52,6 +57,14 @@ namespace UI
                 pausePanel.gameObject.SetActive(false);
             });
             
+            startPanel.gameObject.SetActive(true); 
+            startButton.onClick.AddListener(() =>
+            {
+                startPanel.gameObject.SetActive(false); 
+                // Start the game
+                GameManager.Instance.PrepareGame();
+            });
+            
             exitButton.onClick.AddListener(() =>
             {
 #if UNITY_EDITOR
@@ -65,10 +78,31 @@ namespace UI
             {
                 restartButton.onClick.AddListener(() =>
                 {
-                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                    GameManager.Instance.LoadNextScene();
                 });
             }
-            
+
+            foreach (var colorButton in colorButtons)
+            {
+                colorButton.onClick.AddListener(() =>
+                {
+                    var color = colorButton.GetComponent<Image>().color;
+                    var cubes = FindObjectsOfType<Cube>();
+                    
+                    var player = FindObjectOfType<Player>();
+                    player.TrailRenderer.endColor = color;
+
+                    foreach (var cube in cubes)
+                    {
+                        cube.CubeMat.color = color;
+                    }
+
+                    foreach (var button in colorButtons)
+                    {
+                        button.interactable = button != colorButton;
+                    }
+                });
+            }
         }
 
         private void SetProgressSlider(float value)

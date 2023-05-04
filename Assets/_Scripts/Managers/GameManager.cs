@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Game.Units;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Game.Managers
 {
@@ -23,6 +25,13 @@ namespace Game.Managers
         public static event Action<float> OnProgressChanged;
         public static event Action<float> OnTimerUpdate;
         public static event Action<GameState, GameState> OnGameStateChanged;
+
+        private List<string> sceneNames = new List<string>()
+        {
+            "GameScene",
+            "GameScene2",
+            "GameScene3"
+        };
         
         [SerializeField, Range(30, 144)] 
         private int targetFrameRate = 60;
@@ -55,7 +64,7 @@ namespace Game.Managers
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
-                return;
+                return; 
             }
 
             Instance = this;
@@ -68,8 +77,6 @@ namespace Game.Managers
         {
             _player = GameObject.FindObjectOfType<Player>();
             _endBonusManager = GameObject.FindObjectOfType<EndBonusManager>();
-
-            PrepareGame();
         }
 
         private void Update()
@@ -84,6 +91,10 @@ namespace Game.Managers
             
             if (distFromStart >= _totalDistance)
             {
+                if (!_player.EndEffect.activeSelf)
+                {
+                    _player.EndEffect.SetActive(true);
+                }
                 SetGameState(GameState.Win);
             }
             
@@ -91,7 +102,7 @@ namespace Game.Managers
             OnTimerUpdate?.Invoke(_gameTimer);
         }
         
-        private void PrepareGame()
+        public void PrepareGame()
         {
             _startPos = startPoint.position;
             _endPos = GameObject.FindGameObjectWithTag("FinalZone").transform.position;
@@ -121,6 +132,23 @@ namespace Game.Managers
             _player.CanMove = true;
             
             SetGameState(GameState.Started);
+        }
+
+        public void LoadNextScene()
+        {
+            var currentSceneName = SceneManager.GetActiveScene().name;
+            for (var i = 0; i < sceneNames.Count; i++)
+            {
+                var sceneName = sceneNames[i];
+                if (currentSceneName == sceneName)
+                {
+                    var loadingIndex = i + 1;
+                    if (loadingIndex >= sceneNames.Count)
+                        loadingIndex = 0;
+                    SceneManager.LoadScene(sceneNames[loadingIndex]);
+                    break;
+                }
+            }
         }
 
         public void MultiplyScore(int value)
