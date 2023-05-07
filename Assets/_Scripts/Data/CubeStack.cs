@@ -9,8 +9,12 @@ namespace Game.Data
     {
         [SerializeField] private Transform stackParent;
         [SerializeField] private Transform stackStartingPoint;
+
+        [SerializeField] private AudioSource cubeCollectSound;
         
         private Transform _playerVisual;
+
+        private bool _canPlayAudio;
         
         private const float CUBE_Y = .045f;
         private const float PLAYER_Y = .025f;
@@ -20,6 +24,8 @@ namespace Game.Data
             _playerVisual = stackParent.GetChild(0);
             var firstCube = stackParent.GetChild(1).GetComponent<Cube>();
             Add(firstCube);
+
+            _canPlayAudio = true;
         }
 
         public override bool Add(Cube cube)
@@ -29,7 +35,9 @@ namespace Game.Data
             cube.transform.SetParent(stackParent, true);
             
             ReorderCubes(Ease.InQuad, .15f);
-            
+
+            if (_canPlayAudio) cubeCollectSound.Play();
+
             return true;
         }
 
