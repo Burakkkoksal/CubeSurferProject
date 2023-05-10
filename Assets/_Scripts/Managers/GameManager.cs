@@ -28,9 +28,9 @@ namespace Game.Managers
 
         private List<string> sceneNames = new List<string>()
         {
+            "GameScene3",
             "GameScene",
-            "GameScene2",
-            "GameScene3"
+            "GameScene2"
         };
         
         [SerializeField, Range(30, 144)] 
