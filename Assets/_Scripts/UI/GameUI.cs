@@ -1,22 +1,20 @@
+using System;
 using DG.Tweening;
 using Game.Data;
 using Game.Managers;
 using Game.Units;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace UI
 {
     public class GameUI : MonoBehaviour
     {
-        [SerializeField] private Sprite restartSprite;
-        [SerializeField] private Sprite nextSprite;
-        
         [SerializeField] private TMP_Text scoreText;
         [SerializeField] private TMP_Text timerText;
         [SerializeField] private TMP_Text endText;
-        [SerializeField] private TMP_Text endButtonText;
         [SerializeField] private Transform endPanel;
         [SerializeField] private Transform scorePanel;
         [SerializeField] private Transform startPanel;
@@ -26,8 +24,7 @@ namespace UI
         [SerializeField] private Button resumeButton;
         [SerializeField] private Button startButton;
         [SerializeField] private Button exitButton;
-        [SerializeField] private Button nextButton;
-        [SerializeField] private Button restartButton;
+        [SerializeField] private Button[] restartButtons;
         [SerializeField] private Button[] colorButtons;
 
         private void OnEnable()
@@ -77,10 +74,13 @@ namespace UI
 #endif
             });
 
-            restartButton.onClick.AddListener(() =>
+            foreach (var restartButton in restartButtons)
             {
-                GameManager.Instance.LoadCurrentScene();
-            });
+                restartButton.onClick.AddListener(() =>
+                {
+                    GameManager.Instance.LoadNextScene();
+                });
+            }
 
             foreach (var colorButton in colorButtons)
             {
@@ -104,7 +104,7 @@ namespace UI
                 });
             }
         }
-        
+
         private void SetProgressSlider(float value)
         {
             progressSlider.value = value;
@@ -124,29 +124,13 @@ namespace UI
         {
             if (newState == GameState.Win)
             {
-                nextButton.onClick.RemoveAllListeners();
                 endText.text = "You won!";
                 endText.color = Color.green;
-                endButtonText.text = "Next";
-                nextButton.GetComponent<Image>().sprite = nextSprite;
-
-                nextButton.onClick.AddListener(() =>
-                {
-                    GameManager.Instance.LoadNextScene();
-                });
             }
             else if (newState == GameState.Lose)
             {
-                nextButton.onClick.RemoveAllListeners();
                 endText.text = "You lost!";
                 endText.color = Color.red;
-                endButtonText.text = "Restart";
-                nextButton.GetComponent<Image>().sprite = restartSprite;
-                
-                nextButton.onClick.AddListener(() =>
-                {
-                    GameManager.Instance.LoadCurrentScene();
-                });
             }
             else if (newState == GameState.End)
             {

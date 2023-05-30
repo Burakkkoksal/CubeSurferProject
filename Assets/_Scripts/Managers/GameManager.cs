@@ -137,7 +137,6 @@ namespace Game.Managers
         public void LoadNextScene()
         {
             var currentSceneName = SceneManager.GetActiveScene().name;
-            
             for (var i = 0; i < sceneNames.Count; i++)
             {
                 var sceneName = sceneNames[i];
@@ -150,11 +149,6 @@ namespace Game.Managers
                     break;
                 }
             }
-        }
-
-        public void LoadCurrentScene()
-        {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         public void MultiplyScore(int value)
