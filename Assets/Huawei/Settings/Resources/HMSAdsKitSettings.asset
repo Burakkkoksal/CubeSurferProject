@@ -19,9 +19,13 @@ MonoBehaviour:
     - EnableInterstitialAd
     - EnableRewardedAd
     - EnableSplashAd
+    - ShowBannerOnLoad
+    - UnityBannerAdSizeType
     _values:
     - True
     - True
     - True
     - True
+    - False
     - True
+    - BANNER_SIZE_320_50
